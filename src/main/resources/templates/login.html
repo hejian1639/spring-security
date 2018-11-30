@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title>Spring Security Example </title>
+</head>
+<body>
+<script src="js/jquery.js"></script>
+
+<div th:if="${param.error}">
+    用户名或密码错
+</div>
+<div th:if="${param.logout}">
+    您已注销成功
+</div>
+<form id="formoid">
+    <div><label> 用户名 : <input type="text" id="username" name="username"/> </label></div>
+    <div><label> 密 码 : <input type="password" id="password" name="password"/> </label></div>
+    <div><input type="submit" value="登录"/></div>
+</form>
+<script type='text/javascript'>
+    $("#formoid").submit(function (event) {
+
+        event.preventDefault();
+
+
+        $.ajax({
+            url: '/session/login',
+            type: 'post',
+            contentType: "application/json",
+            data: JSON.stringify({user: $('#username').val(), password: $('#password').val()}),
+            success: function () {
+                window.location.href ='hello'
+            }
+        });
+
+    });
+</script>
+</body>
+</html>
