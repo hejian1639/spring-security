@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
@@ -25,7 +27,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/", "/**/*.js", "favicon.ico", "/login*").permitAll()
+                .antMatchers("/", "/**/*.js", "/favicon.ico", "/login*").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(customAuthenticationFilter(), CustomAuthenticationFilter.class)
@@ -49,18 +51,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return filter;
     }
 
-    //    @Autowired
-    @Override
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication().withUser("u").password("p").roles("USER")
-                .and().withUser("user").password("p").roles("USER");
-    }
 
     @Override
-    @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+        PasswordEncoder encoder = new BCryptPasswordEncoder();
+        auth.inMemoryAuthentication().withUser("u").password(encoder.encode("p")).roles("USER")
+                .and().withUser("user").password(encoder.encode("p")).roles("USER")
+                .and().passwordEncoder(encoder);
     }
+
 
     @Bean
     public ServletRegistrationBean defaultServlet() {
