@@ -1,8 +1,7 @@
 package com.didispace;
 
 import org.apache.catalina.servlets.DefaultServlet;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.embedded.ServletRegistrationBean;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,11 +9,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.csrf.CsrfTokenRepository;
-import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     }
 
+//    @Bean
     CustomAuthenticationFilter customAuthenticationFilter() throws Exception {
         CustomAuthenticationFilter filter = new CustomAuthenticationFilter();
         filter.setFilterProcessesUrl("/session/login");
@@ -51,12 +47,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return filter;
     }
 
+    /**
+     * @return
+     * @throws Exception
+     */
+    @Override
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         PasswordEncoder encoder = new BCryptPasswordEncoder();
-        auth.inMemoryAuthentication().withUser("u").password(encoder.encode("p")).roles("USER")
-                .and().withUser("user").password(encoder.encode("p")).roles("USER")
+        String password=encoder.encode("p");
+        System.out.println(password);
+        auth.inMemoryAuthentication().withUser("u").password(password).roles("USER")
+                .and().withUser("user").password(password).roles("USER")
                 .and().passwordEncoder(encoder);
     }
 
